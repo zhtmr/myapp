@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>비트캠프 5기</title>
+</head>
+<div data-th-replace="header :: header"></div>
+<body>
+
+<div class="container">
+
+    <h1 data-th-text="${title}"></h1>
+
+    <form id="viewFrm" action='' method='post' enctype='multipart/form-data' data-th-object="${board}">
+        <input name='category' type='hidden' data-th-value='${category}'>
+        <div>
+            번호: <input readonly type='text' name='no' data-th-value="*{no}">
+        </div>
+        <div>
+            제목: <input type='text' name='title' data-th-value="*{title}">
+        </div>
+        <div>
+            작성자: <input readonly type='text' data-th-value="*{writer.name}" disabled>
+        </div>
+        <div id="editor" data-th-utext="*{content}"></div>
+        <input type="hidden" name="content" value="">
+        <div data-th-if="${category == 1}">
+            <div class="input-group mb-3">
+                <input type="file" class="form-control" id="inputGroupFile02" name='attachedFiles' multiple>
+                <label class="input-group-text" for="inputGroupFile02">Upload</label>
+            </div>
+            <ul>
+                <li data-th-if="${file.filePath} != null" data-th-each="file : *{files}" data-th-object="${file}">
+                    <!--                    <a data-th-href="@{'/upload/board/' + *{filePath}}" data-th-text="*{filePath}"></a>-->
+                    <a data-th-href="@{'https://kr.object.ncloudstorage.com/bitcamp-devops5-39/board/' + *{filePath}}"
+                       data-th-text="*{filePath}"
+                       href="file.html">a.gif</a>
+                    [<a data-th-href="@{file/delete(category=${category},no=*{no})}" href=''>삭제</a>]
+                </li>
+            </ul>
+        </div>
+        <div>
+            <button id="submit">변경</button>
+            <a data-th-href="@{delete(category=${category},no=${board.no})}" href=''>삭제</a>
+        </div>
+    </form>
+    <br>
+    <h1>뷰어</h1>
+    <hr class="border border-primary border-3 opacity-75">
+    <div id="viewer"></div>
+</div>
+
+<script>
+    const {Editor} = toastui;
+    const {codeSyntaxHighlight} = Editor.plugin;
+
+    const editor = new Editor({
+        el: document.querySelector('#editor'),
+        previewStyle: 'vertical',
+        height: '500px',
+        plugins: [codeSyntaxHighlight],
+        theme: 'dark'
+    });
+
+    // let html = editor.getHTML();
+    let markdown = editor.getMarkdown();
+
+    const viewer = Editor.factory({
+        el: document.querySelector('#viewer'),
+        previewStyle: 'vertical',
+        height: '500px',
+        theme: 'dark',
+        initialEditType: 'markdown',
+        plugins: [codeSyntaxHighlight],
+        viewer: true,
+        initialValue: markdown   // viewer 에는 마크다운 형식으로 해야 된다
+    });
+
+    let $form = $("#viewFrm");
+    $(function () {
+        $('button[id="submit"]').on('click', function () {
+            let content = editor.getHTML();   // 서버 전송시에는 html 로 변환해 전송
+            // let markdown = editor.getMarkdown();
+            $form.children('form input[name="content"]').val(content)
+            $form.attr('action', '/app/board/update').submit()
+            // $.ajax({
+            //     enctype: 'multipart/form-data',
+            //     processData: false,
+            //     contentType: false,
+            //     type: 'post',
+            //     url: '/app/board/add',
+            //     async: false,
+            //     dataType: 'text',
+            //     data: formData,
+            //     success: function (result) {
+            //         console.log(result);
+            //     },
+            //     error: function (request, status, error) {
+            //         console.log(error)
+            //     }
+            // })
+        });
+
+
+        console.log($('[data-nodeid^="h"]').text())
+    })
+
+</script>
+</body>
+<div data-th-replace="footer :: footer"></div>
+</html>
