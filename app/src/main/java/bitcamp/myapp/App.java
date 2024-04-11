@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @PropertySource({
-    "file:${HOME}/config/jdbc.properties",
-    "file:${HOME}/config/ncp.properties",
-    "file:${HOME}/config/ncp-secret.properties"
+    "file:${user.home}/config/jdbc.properties",
+    "file:${user.home}/config/ncp.properties",
+    "file:${user.home}/config/ncp-secret.properties"
 })
 @EnableTransactionManagement
 @SpringBootApplication
